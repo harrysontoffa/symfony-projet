@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><rect width=%22128%22 height=%22128%22 rx=%2228%22 fill=%22%23fbbf24%22/><text x=%2264%22 y=%2292%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22 font-size=%2280%22 fill=%22%230c0a09%22>S</text></svg>">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600&display=swap">
+
         {% block stylesheets %}
         {% endblock %}
 
@@ -18,7 +22,30 @@
         <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
         {% endif %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
+    <body class="flex min-h-screen flex-col bg-stone-950 font-['Inter',sans-serif] text-stone-100 antialiased">
+        <twig:Navbar />
+
+        <main class="flex-1">
+            {% if app.request.hasPreviousSession %}
+                {% set flashes = app.flashes %}
+                {% if flashes is not empty %}
+                    <div class="mx-auto flex max-w-6xl flex-col gap-3 px-6 pt-8 md:px-8">
+                        {% for type, messages in flashes %}
+                            {% for message in messages %}
+                                {% if type in ['error', 'danger', 'warning'] %}
+                                    <div role="alert" class="rounded-[10px] border border-red-900 bg-red-950 px-4 py-3 text-red-200">{{ message }}</div>
+                                {% else %}
+                                    <div role="status" class="rounded-[10px] border border-emerald-800 bg-emerald-950 px-4 py-3 text-emerald-200">{{ message }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            {% block body %}{% endblock %}
+        </main>
+
+        <twig:Footer />
     </body>
 </html>

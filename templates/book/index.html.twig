@@ -1,0 +1,36 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Liste des livres{% endblock %}
+
+{% block body %}
+{% set covers = ['bg-red-900', 'bg-sky-900', 'bg-emerald-900', 'bg-amber-800', 'bg-teal-900', 'bg-stone-700'] %}
+<section class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+    <div class="mb-12 border-b border-stone-800 pb-10">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Bibliothèque</p>
+        <h1 class="mt-5 font-['Fraunces',serif] text-5xl leading-[1.05] font-medium tracking-tight md:text-6xl">Liste des livres</h1>
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-stone-400">{{ books|length }} livre(s) sur les étagères.</p>
+    </div>
+
+    {% if books is empty %}
+        <div class="py-16 text-center">
+            <p class="text-stone-400">Aucun livre pour le moment.</p>
+            <a href="{{ path('app_home') }}" class="mt-6 inline-flex items-center rounded-[10px] border border-stone-700 px-5 py-3 font-semibold text-stone-100 transition-colors hover:border-stone-500 hover:bg-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Retour à l'accueil</a>
+        </div>
+    {% else %}
+        <ul class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {% for livre in books %}
+                <li class="group flex flex-col gap-4">
+                    <div class="{{ covers[loop.index0 % covers|length] }} flex aspect-[2/3] flex-col justify-between rounded-l-[4px] rounded-r-[10px] p-7 transition duration-200 group-hover:-translate-y-1">
+                        <span class="font-['Fraunces',serif] text-2xl leading-tight font-medium tracking-tight text-stone-100">{{ livre.title }}</span>
+                        <span class="text-xs uppercase tracking-widest text-stone-200">{{ livre.author }}</span>
+                    </div>
+                    <div>
+                        <h2 class="font-['Fraunces',serif] text-xl font-medium tracking-tight transition-colors group-hover:text-amber-400">{{ livre.title }}</h2>
+                        <p class="mt-1 text-stone-400">{{ livre.author }}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+{% endblock body %}

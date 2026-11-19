@@ -1,0 +1,24 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Produit {{ id }}{% endblock %}
+
+{% block body %}
+<section class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+    <div class="mb-12 border-b border-stone-800 pb-10">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Produit</p>
+        <h1 class="mt-5 font-['Fraunces',serif] text-5xl leading-[1.05] font-medium tracking-tight md:text-6xl">Produit n°<em class="italic text-amber-400">{{ id }}</em></h1>
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-stone-400">Affichage du produit {{ id }}.</p>
+    </div>
+
+    <div class="flex max-w-md flex-col gap-6 rounded-2xl border border-stone-800 bg-stone-900 p-10">
+        <div class="grid h-12 w-12 place-items-center rounded-xl border border-stone-700 text-amber-400">
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+        </div>
+        <div>
+            <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">Identifiant</h2>
+            <p class="mt-2 font-['Fraunces',serif] text-2xl font-medium tracking-tight">{{ id }}</p>
+        </div>
+        <a href="{{ path('app_home') }}" class="inline-flex items-center justify-center rounded-[10px] border border-stone-700 px-5 py-3 font-semibold text-stone-100 transition-colors hover:border-stone-500 hover:bg-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Retour à l'accueil</a>
+    </div>
+</section>
+{% endblock body %}

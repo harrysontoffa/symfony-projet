@@ -1,0 +1,132 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+{% set fv = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400' %}
+{% set btn_principal = 'inline-flex items-center gap-2 rounded-[10px] bg-amber-400 px-5 py-3 font-semibold text-stone-950 transition-colors hover:bg-amber-300 ' ~ fv %}
+{% set btn_secondaire = 'inline-flex items-center rounded-[10px] border border-stone-700 px-5 py-3 font-semibold text-stone-100 transition-colors hover:border-stone-500 hover:bg-stone-900 ' ~ fv %}
+{% set lien_texte = 'inline-flex items-center gap-1.5 rounded-sm font-semibold text-amber-400 hover:text-amber-300 ' ~ fv %}
+{% set fleche %}<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>{% endset %}
+
+{# Hero #}
+<section class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+    <div class="flex flex-wrap items-center justify-between gap-16">
+        <div class="max-w-xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Bibliothèque en ligne</p>
+            <h1 class="mt-5 font-['Fraunces',serif] text-5xl leading-[1.05] font-medium tracking-tight md:text-6xl">
+                Découvrez, explorez et <em class="italic text-amber-400">partagez</em> vos lectures.
+            </h1>
+            <p class="mt-6 max-w-xl text-lg leading-relaxed text-stone-400">
+                Un catalogue tenu par ses lecteurs : parcourez les livres, découvrez qui les a ajoutés et gardez une trace de ce que vous lisez.
+            </p>
+            <div class="mt-10 flex flex-wrap gap-3">
+                <a href="{{ path('app_books') }}" class="{{ btn_principal }}">Parcourir le catalogue {{ fleche }}</a>
+                <a href="{{ path('app_inscription') }}" class="{{ btn_secondaire }}">Créer un compte</a>
+            </div>
+        </div>
+
+        {# Étagère décorative #}
+        <div aria-hidden="true" class="mx-auto lg:mx-0">
+            <div class="flex items-end gap-1.5 pr-12">
+                <div class="flex h-[260px] w-11 justify-center rounded-sm bg-red-900 py-5 transition duration-200 hover:-translate-y-3">
+                    <span class="rotate-180 font-['Fraunces',serif] text-sm text-stone-100 [writing-mode:vertical-rl]">Les Misérables</span>
+                </div>
+                <div class="flex h-[320px] w-14 justify-center rounded-sm bg-sky-900 py-5 transition duration-200 hover:-translate-y-3">
+                    <span class="rotate-180 font-['Fraunces',serif] text-base text-stone-100 [writing-mode:vertical-rl]">Le Rouge et le Noir</span>
+                </div>
+                <div class="flex h-[285px] w-12 justify-center rounded-sm bg-emerald-900 py-5 transition duration-200 hover:-translate-y-3">
+                    <span class="rotate-180 font-['Fraunces',serif] text-sm text-stone-100 [writing-mode:vertical-rl]">Germinal</span>
+                </div>
+                <div class="hidden h-[300px] w-16 justify-center rounded-sm bg-teal-900 py-5 transition duration-200 hover:-translate-y-3 sm:flex">
+                    <span class="rotate-180 font-['Fraunces',serif] text-base text-stone-100 [writing-mode:vertical-rl]">Madame Bovary</span>
+                </div>
+                <div class="flex h-[240px] w-11 justify-center rounded-sm bg-stone-700 py-5 transition duration-200 hover:-translate-y-3">
+                    <span class="rotate-180 font-['Fraunces',serif] text-sm text-stone-100 [writing-mode:vertical-rl]">Candide</span>
+                </div>
+                <div class="flex h-[280px] w-13 origin-bottom-left rotate-[9deg] justify-center rounded-sm bg-amber-400 py-5 transition duration-200 hover:-translate-y-3">
+                    <span class="rotate-180 font-['Fraunces',serif] text-sm font-semibold text-stone-950 [writing-mode:vertical-rl]">L'Étranger</span>
+                </div>
+            </div>
+            <div class="h-2.5 rounded-sm bg-stone-700"></div>
+        </div>
+    </div>
+</section>
+
+{# Par où commencer #}
+<section class="border-t border-stone-800">
+    <div class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Premiers pas</p>
+        <h2 class="mt-4 font-['Fraunces',serif] text-3xl font-medium tracking-tight md:text-4xl">Par où commencer</h2>
+
+        <div class="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <article class="flex flex-col rounded-2xl border border-stone-800 bg-stone-900 p-8 transition duration-200 hover:-translate-y-1 hover:border-stone-600">
+                <div class="grid h-12 w-12 place-items-center rounded-xl border border-stone-700 text-amber-400">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </div>
+                <h3 class="mt-6 font-['Fraunces',serif] text-2xl font-medium tracking-tight">Livres</h3>
+                <p class="mt-3 flex-1 leading-relaxed text-stone-400">Le catalogue complet, avec résumé, auteur et date de publication pour chaque titre.</p>
+                <a href="{{ path('app_books') }}" class="{{ lien_texte }} mt-6 self-start">Voir les livres {{ fleche }}</a>
+            </article>
+
+            <article class="flex flex-col rounded-2xl border border-stone-800 bg-stone-900 p-8 transition duration-200 hover:-translate-y-1 hover:border-stone-600">
+                <div class="grid h-12 w-12 place-items-center rounded-xl border border-stone-700 text-amber-400">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3 class="mt-6 font-['Fraunces',serif] text-2xl font-medium tracking-tight">Utilisateurs</h3>
+                <p class="mt-3 flex-1 leading-relaxed text-stone-400">Les lecteurs inscrits qui font vivre la bibliothèque et y ajoutent leurs livres.</p>
+                <a href="{{ path('app_showUser') }}" class="{{ lien_texte }} mt-6 self-start">Voir les utilisateurs {{ fleche }}</a>
+            </article>
+
+            <article class="flex flex-col rounded-2xl border border-stone-800 bg-stone-900 p-8 transition duration-200 hover:-translate-y-1 hover:border-stone-600">
+                <div class="grid h-12 w-12 place-items-center rounded-xl border border-stone-700 text-amber-400">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                </div>
+                <h3 class="mt-6 font-['Fraunces',serif] text-2xl font-medium tracking-tight">Mon profil</h3>
+                <p class="mt-3 flex-1 leading-relaxed text-stone-400">Votre espace personnel, pour retrouver vos informations et vos lectures.</p>
+                <a href="{{ path('app_profile', {name: 'invité'}) }}" class="{{ lien_texte }} mt-6 self-start">Voir le profil {{ fleche }}</a>
+            </article>
+        </div>
+    </div>
+</section>
+
+{# Formations #}
+<section class="border-t border-stone-800">
+    <div class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+            <div class="max-w-xl">
+                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Formations</p>
+                <h2 class="mt-4 font-['Fraunces',serif] text-3xl font-medium tracking-tight md:text-4xl">Les parcours proposés</h2>
+                <p class="mt-4 text-lg leading-relaxed text-stone-400">{{ formations|length }} parcours pour passer des bases de PHP à une application Symfony complète.</p>
+            </div>
+            <twig:Badge label="Session" variant="primary" :year="'now'|date('Y') * 1" />
+        </div>
+
+        <div class="mt-8">
+            <twig:Alert message="Les inscriptions sont ouvertes : créez un compte pour réserver votre place." />
+        </div>
+
+        <div class="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {% for item in formations %}
+                <twig:FormationCard title="{{ item.title }}" description="{{ item.description }}" />
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# Bandeau inscription #}
+<section class="border-t border-stone-800">
+    <div class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+        <div class="flex flex-wrap items-center justify-between gap-8 rounded-2xl border border-stone-800 bg-stone-900 p-10">
+            <div class="max-w-xl">
+                <h2 class="font-['Fraunces',serif] text-3xl font-medium tracking-tight md:text-4xl">Pas encore membre ?</h2>
+                <p class="mt-4 text-lg leading-relaxed text-stone-400">Créez un compte pour ajouter vos livres et partager vos lectures avec les autres membres.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ path('app_inscription') }}" class="{{ btn_principal }}">S'inscrire</a>
+                <a href="{{ path('app_connexion') }}" class="{{ btn_secondaire }}">Se connecter</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

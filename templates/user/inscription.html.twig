@@ -1,0 +1,48 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+{% set champ = 'h-12 w-full rounded-[10px] border border-stone-700 bg-stone-950 px-4 text-stone-100 placeholder:text-stone-500 focus:border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-400/20' %}
+{% set label = 'mb-2 block text-sm font-medium text-stone-300' %}
+<section class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+    <div class="flex flex-wrap items-center justify-between gap-16">
+        <div class="max-w-xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Inscription</p>
+            <h1 class="mt-5 font-['Fraunces',serif] text-5xl leading-[1.05] font-medium tracking-tight md:text-6xl">Rejoignez la <em class="italic text-amber-400">salle</em> de lecture.</h1>
+            <p class="mt-6 max-w-xl text-lg leading-relaxed text-stone-400">Créez votre compte pour ajouter vos livres et partager vos lectures avec les autres membres.</p>
+        </div>
+
+        <form method="post" class="flex w-full max-w-md flex-col gap-6 rounded-2xl border border-stone-800 bg-stone-900 p-10">
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    <label for="inscription_firstname" class="{{ label }}">Prénom</label>
+                    <input type="text" id="inscription_firstname" name="firstname" autocomplete="given-name" required class="{{ champ }}">
+                </div>
+                <div>
+                    <label for="inscription_lastname" class="{{ label }}">Nom</label>
+                    <input type="text" id="inscription_lastname" name="lastname" autocomplete="family-name" required class="{{ champ }}">
+                </div>
+            </div>
+            <div>
+                <label for="inscription_email" class="{{ label }}">Adresse email</label>
+                <input type="email" id="inscription_email" name="email" autocomplete="email" required placeholder="vous@exemple.fr" class="{{ champ }}">
+            </div>
+            <div>
+                <label for="inscription_password" class="{{ label }}">Mot de passe</label>
+                <input type="password" id="inscription_password" name="password" autocomplete="new-password" required class="{{ champ }}">
+            </div>
+            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-[10px] bg-amber-400 px-5 py-3 font-semibold text-stone-950 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Créer mon compte</button>
+            <p class="text-center text-sm text-stone-400">
+                Déjà inscrit ?
+                <a href="{{ path('app_connexion') }}" class="rounded-sm font-semibold text-amber-400 hover:text-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Se connecter</a>
+            </p>
+        </form>
+    </div>
+</section>
+{# <div class="mx-auto flex max-w-6xl flex-col gap-3 px-6 pb-20 md:px-8">
+    <twig:Alert message="Bienvenue sur le site !" />
+    <twig:Alert message="Enregistrement réussi." type="success" />
+    <twig:Alert message="Une erreur est survenue." type="danger" />
+</div> #}
+{% endblock %}

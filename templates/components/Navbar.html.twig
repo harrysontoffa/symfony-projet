@@ -1,0 +1,37 @@
+{% set route = app.request.attributes.get('_route') %}
+{% set liens = [
+    {label: 'Accueil', url: path('app_home'), routes: ['app_home']},
+    {label: 'Livres', url: path('app_books'), routes: ['app_books', 'app_book_detaille']},
+    {label: 'Utilisateurs', url: path('app_showUser'), routes: ['app_showUser']},
+] %}
+{% set nav_base = 'rounded-lg px-4 py-2.5 text-[15px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400' %}
+{% set nav_actif = 'bg-stone-900 text-stone-100' %}
+{% set nav_inactif = 'text-stone-400 hover:bg-stone-900 hover:text-stone-100' %}
+
+<header class="border-b border-stone-800">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4 md:px-8">
+        <a href="{{ path('app_home') }}" class="flex items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">
+            <span class="grid h-9 w-9 place-items-center rounded-lg bg-amber-400 font-['Fraunces',serif] font-semibold text-stone-950">S</span>
+            <span class="font-['Fraunces',serif] text-2xl font-semibold tracking-tight">SymfonyLib</span>
+        </a>
+
+        <nav aria-label="Navigation principale" class="flex flex-wrap items-center gap-1">
+            {% for lien in liens %}
+                {% set actif = route in lien.routes %}
+                <a href="{{ lien.url }}" class="{{ nav_base }} {{ actif ? nav_actif : nav_inactif }}"{% if actif %} aria-current="page"{% endif %}>{{ lien.label }}</a>
+            {% endfor %}
+        </nav>
+
+        <div class="flex flex-wrap items-center gap-2">
+            {% if app.user %}
+                {% set profil_actif = route == 'app_profile' %}
+                <a href="{{ path('app_profile', {name: app.user.userIdentifier}) }}" class="{{ nav_base }} {{ profil_actif ? nav_actif : nav_inactif }}"{% if profil_actif %} aria-current="page"{% endif %}>Mon profil</a>
+                <a href="{{ logout_path() }}" class="inline-flex items-center rounded-[10px] border border-stone-700 px-5 py-3 font-semibold text-stone-100 transition-colors hover:border-stone-500 hover:bg-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Déconnexion</a>
+            {% else %}
+                {% set connexion_actif = route == 'app_connexion' %}
+                <a href="{{ path('app_connexion') }}" class="{{ nav_base }} {{ connexion_actif ? nav_actif : nav_inactif }}"{% if connexion_actif %} aria-current="page"{% endif %}>Connexion</a>
+                <a href="{{ path('app_inscription') }}" class="inline-flex items-center gap-2 rounded-[10px] bg-amber-400 px-5 py-3 font-semibold text-stone-950 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">S'inscrire</a>
+            {% endif %}
+        </div>
+    </div>
+</header>

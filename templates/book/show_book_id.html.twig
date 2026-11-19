@@ -1,0 +1,24 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    Détail du livre
+{% endblock title %}
+
+{% block body %}
+<section class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+    {% if book %}
+        <twig:InfoCard
+            id="{{ book.id }}"
+            title="{{ book.title }}"
+            description="{{ book.resume }}"
+            author="{{ book.author }}"
+            date="{{ book.publishedAt ? book.publishedAt|date('d/m/Y') : 'Non publié' }}"
+        />
+    {% else %}
+        <div class="py-16 text-center">
+            <p class="text-stone-400">Aucun livre trouvé.</p>
+            <a href="{{ path('app_books') }}" class="mt-6 inline-flex items-center rounded-[10px] border border-stone-700 px-5 py-3 font-semibold text-stone-100 transition-colors hover:border-stone-500 hover:bg-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Retour au catalogue</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock body %}

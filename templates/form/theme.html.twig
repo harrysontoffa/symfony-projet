@@ -1,0 +1,89 @@
+{#
+    Form theme « Salle de lecture » : applique les classes Tailwind de la charte
+    à tous les formulaires Symfony. Déclaré dans config/packages/twig.yaml.
+    Le formulaire lui-même se place dans une carte :
+    <div class="max-w-md rounded-2xl border border-stone-800 bg-stone-900 p-10">{{ form(form) }}</div>
+#}
+{% use 'form_div_layout.html.twig' %}
+
+{%- block form_start -%}
+    {%- set attr = attr|merge({class: ('flex flex-col gap-6 ' ~ attr.class|default(''))|trim}) -%}
+    {{- parent() -}}
+{%- endblock form_start -%}
+
+{%- block form_row -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~ '_help'}} -%}
+    {%- endif -%}
+    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_label(form) -}}
+        {{- form_widget(form, widget_attr) -}}
+        {{- form_help(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock form_row -%}
+
+{%- block checkbox_row -%}
+    <div{% with {attr: row_attr|merge({class: ('flex flex-wrap items-center gap-3 ' ~ row_attr.class|default(''))|trim})} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_widget(form) -}}
+        {{- form_label(form, null, {label_attr: {class: 'text-sm font-medium text-stone-300'}}) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock checkbox_row -%}
+
+{%- block radio_row -%}
+    {{- block('checkbox_row') -}}
+{%- endblock radio_row -%}
+
+{%- block form_label -%}
+    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('mb-2 block text-sm font-medium text-stone-300'))|trim}) -%}
+    {{- parent() -}}
+{%- endblock form_label -%}
+
+{%- block form_widget_simple -%}
+    {%- if type is not defined or type not in ['checkbox', 'radio', 'file', 'hidden', 'range', 'color'] -%}
+        {%- set attr = attr|merge({class: ('h-12 w-full rounded-[10px] border border-stone-700 bg-stone-950 px-4 text-stone-100 placeholder:text-stone-500 focus:border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-400/20 ' ~ attr.class|default(''))|trim}) -%}
+    {%- elseif type == 'file' -%}
+        {%- set attr = attr|merge({class: ('block w-full text-sm text-stone-300 file:mr-4 file:rounded-[10px] file:border file:border-stone-700 file:bg-stone-950 file:px-4 file:py-2.5 file:font-semibold file:text-stone-100 hover:file:bg-stone-900 ' ~ attr.class|default(''))|trim}) -%}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock form_widget_simple -%}
+
+{%- block textarea_widget -%}
+    {%- set attr = attr|merge({class: ('min-h-32 w-full rounded-[10px] border border-stone-700 bg-stone-950 px-4 py-3 text-stone-100 placeholder:text-stone-500 focus:border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-400/20 ' ~ attr.class|default(''))|trim}) -%}
+    {{- parent() -}}
+{%- endblock textarea_widget -%}
+
+{%- block choice_widget_collapsed -%}
+    {%- set attr = attr|merge({class: ('h-12 w-full rounded-[10px] border border-stone-700 bg-stone-950 px-4 text-stone-100 focus:border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-400/20 ' ~ attr.class|default(''))|trim}) -%}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed -%}
+
+{%- block checkbox_widget -%}
+    {%- set attr = attr|merge({class: ('h-[18px] w-[18px] accent-amber-400 ' ~ attr.class|default(''))|trim}) -%}
+    {{- parent() -}}
+{%- endblock checkbox_widget -%}
+
+{%- block radio_widget -%}
+    {%- set attr = attr|merge({class: ('h-[18px] w-[18px] accent-amber-400 ' ~ attr.class|default(''))|trim}) -%}
+    {{- parent() -}}
+{%- endblock radio_widget -%}
+
+{%- block button_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('inline-flex items-center justify-center gap-2 rounded-[10px] bg-amber-400 px-5 py-3 font-semibold text-stone-950 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400'))|trim}) -%}
+    {{- parent() -}}
+{%- endblock button_widget -%}
+
+{%- block form_help -%}
+    {%- set help_attr = help_attr|merge({class: (help_attr.class|default('mt-2 text-sm text-stone-400'))|trim}) -%}
+    {{- parent() -}}
+{%- endblock form_help -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        {%- for error in errors -%}
+            <p class="mt-2 text-sm text-red-300">{{ error.message }}</p>
+        {%- endfor -%}
+    {%- endif -%}
+{%- endblock form_errors -%}

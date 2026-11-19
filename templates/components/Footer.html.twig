@@ -1,0 +1,38 @@
+{% set lien_footer = 'rounded-sm text-stone-300 transition-colors hover:text-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400' %}
+
+<footer class="border-t border-stone-800">
+    <div class="mx-auto max-w-6xl px-6 py-16 md:px-8">
+        <div class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="lg:col-span-2">
+                <a href="{{ path('app_home') }}" class="inline-flex items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">
+                    <span class="grid h-9 w-9 place-items-center rounded-lg bg-amber-400 font-['Fraunces',serif] font-semibold text-stone-950">S</span>
+                    <span class="font-['Fraunces',serif] text-2xl font-semibold tracking-tight">SymfonyLib</span>
+                </a>
+                <p class="mt-5 max-w-sm leading-relaxed text-stone-400">
+                    Une bibliothèque en ligne pour découvrir, explorer et partager vos lectures préférées.
+                </p>
+            </div>
+
+            <div>
+                <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">Navigation</h2>
+                <ul class="mt-5 flex flex-col gap-3">
+                    <li><a href="{{ path('app_home') }}" class="{{ lien_footer }}">Accueil</a></li>
+                    <li><a href="{{ path('app_books') }}" class="{{ lien_footer }}">Livres</a></li>
+                    <li><a href="{{ path('app_showUser') }}" class="{{ lien_footer }}">Utilisateurs</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">Compte</h2>
+                <ul class="mt-5 flex flex-col gap-3">
+                    <li><a href="{{ path('app_connexion') }}" class="{{ lien_footer }}">Connexion</a></li>
+                    <li><a href="{{ path('app_inscription') }}" class="{{ lien_footer }}">Inscription</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-14 border-t border-stone-800 pt-6 text-sm text-stone-400">
+            © {{ "now"|date("Y") }} SymfonyLib
+        </div>
+    </div>
+</footer>

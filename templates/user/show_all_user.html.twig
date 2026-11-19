@@ -1,0 +1,43 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Liste des utilisateurs{% endblock %}
+
+{% block body %}
+<section class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+    <div class="mb-12 border-b border-stone-800 pb-10">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Communauté</p>
+        <h1 class="mt-5 font-['Fraunces',serif] text-5xl leading-[1.05] font-medium tracking-tight md:text-6xl">Les <em class="italic text-amber-400">lecteurs</em></h1>
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-stone-400">{{ user|length }} utilisateur(s) inscrit(s) à la bibliothèque.</p>
+    </div>
+
+    <div class="overflow-x-auto rounded-2xl border border-stone-800">
+        <table class="min-w-full">
+            <thead>
+                <tr>
+                    <th scope="col" class="border-b border-stone-800 px-6 py-4 text-left text-xs uppercase tracking-wider text-stone-400">ID</th>
+                    <th scope="col" class="border-b border-stone-800 px-6 py-4 text-left text-xs uppercase tracking-wider text-stone-400">Prénom</th>
+                    <th scope="col" class="border-b border-stone-800 px-6 py-4 text-left text-xs uppercase tracking-wider text-stone-400">Nom</th>
+                    <th scope="col" class="border-b border-stone-800 px-6 py-4 text-left text-xs uppercase tracking-wider text-stone-400">Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in user %}
+                    <tr class="transition-colors hover:bg-stone-900">
+                        <td class="border-b border-stone-800/60 px-6 py-4 text-sm text-stone-400">{{ item.id }}</td>
+                        <td class="border-b border-stone-800/60 px-6 py-4 font-medium text-stone-100">{{ item.firstname }}</td>
+                        <td class="border-b border-stone-800/60 px-6 py-4 text-stone-100">{{ item.lastname }}</td>
+                        <td class="border-b border-stone-800/60 px-6 py-4 text-stone-300">{{ item.email }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-16 text-center">
+                            <p class="text-stone-400">Aucun utilisateur trouvé.</p>
+                            <a href="{{ path('app_inscription') }}" class="mt-6 inline-flex items-center rounded-[10px] border border-stone-700 px-5 py-3 font-semibold text-stone-100 transition-colors hover:border-stone-500 hover:bg-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Créer un compte</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
