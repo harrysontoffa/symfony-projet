@@ -2,131 +2,439 @@
 
 {% block title %}Accueil{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap">
+    <link rel="preload" as="image" href="{{ asset('images/story/prologue-bibliotheque-paysage.webp') }}" media="(orientation: landscape)" fetchpriority="high">
+    <link rel="preload" as="image" href="{{ asset('images/story/prologue-bibliotheque-portrait.webp') }}" media="(orientation: portrait)" fetchpriority="high">
+{% endblock %}
+
 {% block body %}
+{#
+    L'accueil raconte la bibliothèque comme une histoire, de l'aube à la nuit.
+    Animé par assets/controllers/story_controller.js, mis en forme par assets/styles/story.css.
+    Photos : Unsplash (voir les crédits en bas de page). Citations : domaine public.
+#}
+{% set user_name = app.user ? app.user.firstname : null %}
+{% set mois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'] %}
+{% set jour = 'now'|date('j') %}
+{% set aujourdhui = (jour == '1' ? '1er' : jour) ~ ' ' ~ mois['now'|date('n') - 1] ~ ' ' ~ 'now'|date('Y') %}
+
+{% set scenes = [
+    {key: 'bibliotheque', file: 'prologue-bibliotheque', tint: '253, 224, 170', credit: 'https://unsplash.com/photos/TIS8AnSiFI4', label: 'Trinity College, Dublin'},
+    {key: 'aube', file: 'aube-foret', tint: '255, 243, 210', credit: 'https://unsplash.com/photos/kL4w5yf8-Ik', label: 'Bromo, Indonésie'},
+    {key: 'large', file: 'large-mer', tint: '214, 228, 240', credit: 'https://unsplash.com/photos/agE97zp_Xvo', label: 'Southwold, Angleterre'},
+    {key: 'ville', file: 'ville-montmartre', tint: '255, 200, 128', credit: 'https://unsplash.com/photos/pb7sW6XCNiQ', label: 'Montmartre, Paris'},
+    {key: 'nuit', file: 'nuit-etoiles', tint: '226, 236, 255', credit: 'https://unsplash.com/photos/DdjQaVxAqRA', label: 'Kazbegi, Géorgie'},
+    {key: 'bougie', file: 'epilogue-bougie', tint: '255, 194, 120', credit: 'https://unsplash.com/photos/SgsYqDtAzPI', label: 'À la bougie'},
+] %}
+{% set toc = [
+    {id: 'prologue', numeral: 'P', label: 'Prologue'},
+    {id: 'chapitre-1', numeral: 'I', label: "L'aube"},
+    {id: 'chapitre-2', numeral: 'II', label: 'Le large'},
+    {id: 'chapitre-3', numeral: 'III', label: 'La ville'},
+    {id: 'chapitre-4', numeral: 'IV', label: 'La nuit'},
+    {id: 'epilogue', numeral: 'É', label: 'Épilogue'},
+] %}
+{# La Grande Ourse : 7 étoiles (en % du ciel), les parcours prennent les places dans cet ordre. #}
+{% set sky_slots = [
+    {x: 6, y: 25, place: 'below'},
+    {x: 22, y: 13, place: 'below'},
+    {x: 37, y: 19, place: 'above'},
+    {x: 51, y: 35, place: 'below'},
+    {x: 55, y: 70, place: 'left'},
+    {x: 82, y: 76, place: 'below'},
+    {x: 88, y: 36, place: 'above-left'},
+] %}
+{% set sky_order = [0, 2, 4, 5, 6, 1, 3] %}
+{% set sky_lines = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 3]] %}
+{% set used_slots = sky_order|slice(0, formations|length) %}
+
 {% set fv = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400' %}
 {% set btn_principal = 'inline-flex items-center gap-2 rounded-[10px] bg-amber-400 px-5 py-3 font-semibold text-stone-950 transition-colors hover:bg-amber-300 ' ~ fv %}
-{% set btn_secondaire = 'inline-flex items-center rounded-[10px] border border-stone-700 px-5 py-3 font-semibold text-stone-100 transition-colors hover:border-stone-500 hover:bg-stone-900 ' ~ fv %}
-{% set lien_texte = 'inline-flex items-center gap-1.5 rounded-sm font-semibold text-amber-400 hover:text-amber-300 ' ~ fv %}
+{% set lien_texte = 'inline-flex items-center gap-1.5 rounded-sm font-semibold text-amber-300 hover:text-amber-200 ' ~ fv %}
+{% set eyebrow = 'text-xs font-semibold uppercase tracking-[0.22em] text-amber-200' %}
+{% set quote_style = "font-['Fraunces',serif] text-[1.85rem] leading-[1.16] italic text-stone-50 sm:text-5xl md:text-[3.6rem]" %}
+{% set panel = 'rounded-3xl border border-white/10 bg-stone-950/60 p-8 backdrop-blur-md md:p-12' %}
+{% set h2_style = "font-['Fraunces',serif] text-4xl font-medium tracking-tight text-stone-50 md:text-5xl" %}
 {% set fleche %}<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>{% endset %}
 
-{# Hero #}
-<section class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
-    <div class="flex flex-wrap items-center justify-between gap-16">
-        <div class="max-w-xl">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Bibliothèque en ligne</p>
-            <h1 class="mt-5 font-['Fraunces',serif] text-5xl leading-[1.05] font-medium tracking-tight md:text-6xl">
-                Découvrez, explorez et <em class="italic text-amber-400">partagez</em> vos lectures.
-            </h1>
-            <p class="mt-6 max-w-xl text-lg leading-relaxed text-stone-400">
-                Un catalogue tenu par ses lecteurs : parcourez les livres, découvrez qui les a ajoutés et gardez une trace de ce que vous lisez.
-            </p>
-            <div class="mt-10 flex flex-wrap gap-3">
-                <a href="{{ path('app_books') }}" class="{{ btn_principal }}">Parcourir le catalogue {{ fleche }}</a>
-                <a href="{{ path('app_inscription') }}" class="{{ btn_secondaire }}">Créer un compte</a>
-            </div>
-        </div>
+<div data-controller="story" class="relative overflow-x-clip">
 
-        {# Étagère décorative #}
-        <div aria-hidden="true" class="mx-auto lg:mx-0">
-            <div class="flex items-end gap-1.5 pr-12">
-                <div class="flex h-[260px] w-11 justify-center rounded-sm bg-red-900 py-5 transition duration-200 hover:-translate-y-3">
-                    <span class="rotate-180 font-['Fraunces',serif] text-sm text-stone-100 [writing-mode:vertical-rl]">Les Misérables</span>
-                </div>
-                <div class="flex h-[320px] w-14 justify-center rounded-sm bg-sky-900 py-5 transition duration-200 hover:-translate-y-3">
-                    <span class="rotate-180 font-['Fraunces',serif] text-base text-stone-100 [writing-mode:vertical-rl]">Le Rouge et le Noir</span>
-                </div>
-                <div class="flex h-[285px] w-12 justify-center rounded-sm bg-emerald-900 py-5 transition duration-200 hover:-translate-y-3">
-                    <span class="rotate-180 font-['Fraunces',serif] text-sm text-stone-100 [writing-mode:vertical-rl]">Germinal</span>
-                </div>
-                <div class="hidden h-[300px] w-16 justify-center rounded-sm bg-teal-900 py-5 transition duration-200 hover:-translate-y-3 sm:flex">
-                    <span class="rotate-180 font-['Fraunces',serif] text-base text-stone-100 [writing-mode:vertical-rl]">Madame Bovary</span>
-                </div>
-                <div class="flex h-[240px] w-11 justify-center rounded-sm bg-stone-700 py-5 transition duration-200 hover:-translate-y-3">
-                    <span class="rotate-180 font-['Fraunces',serif] text-sm text-stone-100 [writing-mode:vertical-rl]">Candide</span>
-                </div>
-                <div class="flex h-[280px] w-13 origin-bottom-left rotate-[9deg] justify-center rounded-sm bg-amber-400 py-5 transition duration-200 hover:-translate-y-3">
-                    <span class="rotate-180 font-['Fraunces',serif] text-sm font-semibold text-stone-950 [writing-mode:vertical-rl]">L'Étranger</span>
-                </div>
+    {# ---------- Décor fixe ---------- #}
+    <div class="story-stage" aria-hidden="true">
+        {% for scene in scenes %}
+            <div class="story-scene" data-story-target="scene" data-scene="{{ scene.key }}" data-tint="{{ scene.tint }}">
+                <picture>
+                    <source media="(orientation: portrait)" srcset="{{ asset('images/story/' ~ scene.file ~ '-portrait.webp') }}" width="900" height="1600">
+                    <img src="{{ asset('images/story/' ~ scene.file ~ '-paysage.webp') }}" width="2000" height="1250" alt="" decoding="async" fetchpriority="{{ loop.first ? 'high' : 'low' }}">
+                </picture>
             </div>
-            <div class="h-2.5 rounded-sm bg-stone-700"></div>
-        </div>
+        {% endfor %}
+        <div class="story-stage__night" data-story-target="night"></div>
+        <canvas class="story-stage__dust" data-story-target="dust"></canvas>
+        <div class="story-stage__grain"></div>
+        <div class="story-stage__vignette"></div>
     </div>
-</section>
+    <div class="story-flash" data-story-target="flash" aria-hidden="true"></div>
 
-{# Par où commencer #}
-<section class="border-t border-stone-800">
-    <div class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
-        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Premiers pas</p>
-        <h2 class="mt-4 font-['Fraunces',serif] text-3xl font-medium tracking-tight md:text-4xl">Par où commencer</h2>
-
-        <div class="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <article class="flex flex-col rounded-2xl border border-stone-800 bg-stone-900 p-8 transition duration-200 hover:-translate-y-1 hover:border-stone-600">
-                <div class="grid h-12 w-12 place-items-center rounded-xl border border-stone-700 text-amber-400">
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-                </div>
-                <h3 class="mt-6 font-['Fraunces',serif] text-2xl font-medium tracking-tight">Livres</h3>
-                <p class="mt-3 flex-1 leading-relaxed text-stone-400">Le catalogue complet, avec résumé, auteur et date de publication pour chaque titre.</p>
-                <a href="{{ path('app_books') }}" class="{{ lien_texte }} mt-6 self-start">Voir les livres {{ fleche }}</a>
-            </article>
-
-            <article class="flex flex-col rounded-2xl border border-stone-800 bg-stone-900 p-8 transition duration-200 hover:-translate-y-1 hover:border-stone-600">
-                <div class="grid h-12 w-12 place-items-center rounded-xl border border-stone-700 text-amber-400">
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </div>
-                <h3 class="mt-6 font-['Fraunces',serif] text-2xl font-medium tracking-tight">Utilisateurs</h3>
-                <p class="mt-3 flex-1 leading-relaxed text-stone-400">Les lecteurs inscrits qui font vivre la bibliothèque et y ajoutent leurs livres.</p>
-                <a href="{{ path('app_showUser') }}" class="{{ lien_texte }} mt-6 self-start">Voir les utilisateurs {{ fleche }}</a>
-            </article>
-
-            <article class="flex flex-col rounded-2xl border border-stone-800 bg-stone-900 p-8 transition duration-200 hover:-translate-y-1 hover:border-stone-600">
-                <div class="grid h-12 w-12 place-items-center rounded-xl border border-stone-700 text-amber-400">
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
-                </div>
-                <h3 class="mt-6 font-['Fraunces',serif] text-2xl font-medium tracking-tight">Mon profil</h3>
-                <p class="mt-3 flex-1 leading-relaxed text-stone-400">Votre espace personnel, pour retrouver vos informations et vos lectures.</p>
-                <a href="{{ path('app_profile', {name: 'invité'}) }}" class="{{ lien_texte }} mt-6 self-start">Voir le profil {{ fleche }}</a>
-            </article>
-        </div>
-    </div>
-</section>
-
-{# Formations #}
-<section class="border-t border-stone-800">
-    <div class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
-        <div class="flex flex-wrap items-end justify-between gap-6">
-            <div class="max-w-xl">
-                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Formations</p>
-                <h2 class="mt-4 font-['Fraunces',serif] text-3xl font-medium tracking-tight md:text-4xl">Les parcours proposés</h2>
-                <p class="mt-4 text-lg leading-relaxed text-stone-400">{{ formations|length }} parcours pour passer des bases de PHP à une application Symfony complète.</p>
-            </div>
-            <twig:Badge label="Session" variant="primary" :year="'now'|date('Y') * 1" />
-        </div>
-
-        <div class="mt-8">
-            <twig:Alert message="Les inscriptions sont ouvertes : créez un compte pour réserver votre place." />
-        </div>
-
-        <div class="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {% for item in formations %}
-                <twig:FormationCard title="{{ item.title }}" description="{{ item.description }}" />
+    {# ---------- Sommaire ---------- #}
+    <nav aria-label="Chapitres de l'histoire" class="fixed top-1/2 right-4 z-30 hidden -translate-y-1/2 rounded-full bg-stone-950/40 p-1.5 backdrop-blur-sm lg:block xl:right-6">
+        <ol class="flex flex-col items-end gap-1">
+            {% for item in toc %}
+                <li>
+                    <a href="#{{ item.id }}" data-story-target="tocLink" data-action="story#goTo" class="group relative flex items-center gap-3 rounded-full text-stone-400 transition-colors hover:text-stone-100 aria-current:text-amber-300 {{ fv }}">
+                        <span class="pointer-events-none absolute right-14 rounded-full bg-stone-950/70 px-3 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">{{ item.label }}</span>
+                        <span class="grid h-9 min-w-9 place-items-center rounded-full border border-current/25 px-2 font-['Fraunces',serif] text-sm italic group-aria-current:border-amber-300/70 group-aria-current:bg-amber-300/10">{{ item.numeral }}</span>
+                    </a>
+                </li>
             {% endfor %}
-        </div>
-    </div>
-</section>
+        </ol>
+    </nav>
 
-{# Bandeau inscription #}
-<section class="border-t border-stone-800">
-    <div class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
-        <div class="flex flex-wrap items-center justify-between gap-8 rounded-2xl border border-stone-800 bg-stone-900 p-10">
-            <div class="max-w-xl">
-                <h2 class="font-['Fraunces',serif] text-3xl font-medium tracking-tight md:text-4xl">Pas encore membre ?</h2>
-                <p class="mt-4 text-lg leading-relaxed text-stone-400">Créez un compte pour ajouter vos livres et partager vos lectures avec les autres membres.</p>
+    {# ---------- Prologue : le livre qui s'ouvre ---------- #}
+    <section id="prologue" class="relative z-10 min-h-svh story-motion:h-[340svh]" data-story-target="prologue" data-scene="bibliotheque" aria-labelledby="prologue-titre">
+        <div class="sticky top-0 h-svh overflow-hidden" data-story-target="prologueStage">
+            <div class="story-rays" data-story-target="rays" aria-hidden="true"></div>
+            <div class="story-glow" data-story-target="glow" aria-hidden="true"></div>
+
+            <div class="relative mx-auto h-full max-w-6xl px-6 md:px-8">
+                <div class="absolute inset-x-6 top-[8svh] md:inset-x-8 lg:top-1/2 lg:right-auto lg:max-w-124 lg:-translate-y-1/2" data-story-target="heroText">
+                    <p class="{{ eyebrow }}" data-story-target="heroLine">SymfonyLib · Bibliothèque en ligne</p>
+                    <h1 id="prologue-titre" class="mt-5 font-['Fraunces',serif] text-[2.7rem] leading-[1.02] font-medium tracking-tight text-stone-50 sm:text-6xl lg:text-7xl" data-story-target="heroTitle">Chaque livre est une <em class="text-amber-300 italic">porte</em>.</h1>
+                    <p class="mt-6 max-w-md text-base leading-relaxed text-stone-300 sm:text-lg" data-story-target="heroLine">
+                        {% if user_name %}Bon retour, {{ user_name }}. Faites défiler&nbsp;: le livre va s'ouvrir, et l'histoire reprend là où vous l'aviez laissée.{% else %}Un catalogue tenu par ses lecteurs, à parcourir comme on lit une histoire. Faites défiler&nbsp;: le livre va s'ouvrir.{% endif %}
+                    </p>
+                    <a href="{{ path('app_books') }}" class="{{ lien_texte }} mt-7 text-sm" data-story-target="heroLine">Passer l'histoire et voir le catalogue {{ fleche }}</a>
+                </div>
             </div>
-            <div class="flex flex-wrap gap-3">
-                <a href="{{ path('app_inscription') }}" class="{{ btn_principal }}">S'inscrire</a>
-                <a href="{{ path('app_connexion') }}" class="{{ btn_secondaire }}">Se connecter</a>
+
+            {# Le livre 3D. Décoratif : son texte reprend ce que la page dit déjà. #}
+            <div class="story-book-anchor" data-story-target="bookAnchor" aria-hidden="true">
+                <div class="story-book-intro" data-story-target="bookIntro">
+                    <div class="story-book-tilt" data-story-target="bookTilt">
+                        <div class="story-book-float">
+                            <div class="story-book" data-story-target="book">
+                                <div class="story-book__face story-book__back story-book__leather"></div>
+                                <div class="story-book__face story-book__spine story-book__leather"><span>SymfonyLib</span></div>
+                                <div class="story-book__face story-book__fore"></div>
+                                <div class="story-book__face story-book__head"></div>
+                                <div class="story-book__face story-book__tail"></div>
+                                <div class="story-book__face story-book__page">
+                                    <div class="story-book__page-inner">
+                                        <p class="story-book__chapter" data-story-target="pageLine">Chapitre premier</p>
+                                        <p class="story-book__once" data-story-target="pageLine">Il était une fois…</p>
+                                        <svg class="story-book__rule" data-story-target="pageLine" viewBox="0 0 120 12" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 6h44M72 6h44M60 1l5 5-5 5-5-5z"/></svg>
+                                        <p class="story-book__text" data-story-target="pageLine">…une bibliothèque où chaque lecteur déposait ses livres sur les étagères. On racontait qu'il suffisait d'en ouvrir un pour partir très loin, dès l'aube.</p>
+                                        <p class="story-book__folio">1</p>
+                                    </div>
+                                    <span class="story-book__light" data-story-target="pageLight"></span>
+                                </div>
+                                <div class="story-book__ribbon"><i data-story-target="ribbon"><span></span></i></div>
+                                <div class="story-book__hinge">
+                                    <div class="story-book__cover" data-story-target="cover">
+                                        <div class="story-book__face story-book__front story-book__leather">
+                                            <span class="story-book__frame"></span>
+                                            <div class="story-book__cover-text">
+                                                <span class="story-book__tome">Tome I</span>
+                                                <svg class="story-book__fleuron" viewBox="0 0 120 40" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M60 6 66 20 60 34 54 20Z"/><path d="M54 20c-10 0-14-10-24-8s-8 12 0 14c6 1 8-4 4-6M66 20c10 0 14-10 24-8s8 12 0 14c-6 1-8-4-4-6M6 20h18M96 20h18"/></svg>
+                                                <span class="story-book__title story-book__gold">SymfonyLib</span>
+                                                <span class="story-book__subtitle">La bibliothèque des lecteurs</span>
+                                            </div>
+                                            <span class="story-book__sheen"></span>
+                                        </div>
+                                        <div class="story-book__face story-book__inside">
+                                            <div class="story-book__exlibris">
+                                                <span class="story-book__exlibris-kicker">Ex-libris</span>
+                                                <span class="story-book__exlibris-label">Ce livre appartient à</span>
+                                                <span class="story-book__exlibris-name">{{ user_name ?? 'vous' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pointer-events-none absolute inset-x-0 bottom-6 hidden flex-col items-center gap-3 text-[11px] font-semibold tracking-[0.3em] text-stone-300/80 uppercase sm:flex" data-story-target="cue" aria-hidden="true">
+                <span>Faites défiler</span>
+                <span class="story-cue__line"></span>
             </div>
         </div>
+    </section>
+
+    {# ---------- Chapitres : le fil d'or les relie ---------- #}
+    <div class="relative" data-story-target="chapters">
+        <svg class="story-thread hidden story-motion:block" data-story-target="thread" aria-hidden="true">
+            <defs>
+                <radialGradient id="story-spark">
+                    <stop offset="0" stop-color="#fffaf0"/>
+                    <stop offset="0.3" stop-color="#fcd34d" stop-opacity="0.9"/>
+                    <stop offset="1" stop-color="#fbbf24" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            <path class="story-thread__halo" data-story-target="threadHalo"/>
+            <path class="story-thread__line" data-story-target="threadLine"/>
+            <g class="story-thread__tip" data-story-target="threadTip">
+                <circle r="18" fill="url(#story-spark)"/>
+                <circle r="2.6" fill="#fffaf0"/>
+            </g>
+        </svg>
+
+        {# Chapitre I — L'aube : partir #}
+        <section id="chapitre-1" class="relative z-10" data-story-target="chapter" data-scene="aube" data-scene-reveal="flash" aria-labelledby="chapitre-1-titre">
+            <div class="mx-auto max-w-6xl px-6 pt-[30svh] pb-[22svh] md:px-8">
+                <header class="relative">
+                    <span class="story-knot hidden -left-4.5 story-motion:block md:-left-6 xl:-left-10" data-story-target="knot"></span>
+                    <span class="story-numeral right-0" data-story-target="numeral" aria-hidden="true">I</span>
+                    <p class="{{ eyebrow }}">Chapitre I · L'aube</p>
+                </header>
+                <blockquote class="relative mt-8 max-w-4xl">
+                    <p class="{{ quote_style }}" data-story-target="quote">«&nbsp;Demain, dès l'aube, à l'heure où blanchit la campagne,<br>Je partirai.&nbsp;»</p>
+                    <footer class="mt-6 text-sm text-stone-300">— Victor Hugo, <cite class="italic">Les Contemplations</cite>, 1856</footer>
+                </blockquote>
+
+                <div class="{{ panel }} mt-[16svh] grid gap-10 md:grid-cols-[1.3fr_1fr] md:items-end" data-story-target="reveal">
+                    <div>
+                        <h2 id="chapitre-1-titre" class="{{ h2_style }}">Partir</h2>
+                        <p class="mt-5 max-w-lg text-lg leading-relaxed text-stone-300">Toute lecture commence par un départ. Le catalogue est le vôtre&nbsp;: chaque titre, son résumé, son auteur, et la date où il a rejoint les étagères.</p>
+                        <a href="{{ path('app_books') }}" class="{{ btn_principal }} mt-8">Parcourir le catalogue {{ fleche }}</a>
+                    </div>
+                    <div class="md:text-right">
+                        {% if bookCount > 0 %}
+                            <p class="font-['Fraunces',serif] text-7xl leading-none font-medium text-amber-300 tabular-nums md:text-8xl" data-story-target="count" data-count-to="{{ bookCount }}">{{ bookCount }}</p>
+                            <p class="mt-3 text-stone-300">{{ bookCount > 1 ? 'livres vous attendent sur les étagères.' : 'livre vous attend sur les étagères.' }}</p>
+                        {% else %}
+                            <p class="font-['Fraunces',serif] text-2xl text-stone-200 italic">Les étagères attendent leur tout premier livre.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# Chapitre II — Le large : explorer les catégories #}
+        <section id="chapitre-2" class="relative z-10" data-story-target="chapter" data-scene="large" aria-labelledby="chapitre-2-titre">
+            <div class="mx-auto max-w-6xl px-6 pt-[30svh] pb-[22svh] md:px-8">
+                <header class="relative text-right">
+                    <span class="story-knot hidden -right-4.5 story-motion:block md:-right-6 xl:-right-10" data-story-target="knot"></span>
+                    <span class="story-numeral left-0" data-story-target="numeral" aria-hidden="true">II</span>
+                    <p class="{{ eyebrow }}">Chapitre II · Le large</p>
+                </header>
+                <blockquote class="relative mt-8 ml-auto max-w-4xl text-right">
+                    <p class="{{ quote_style }}" data-story-target="quote">«&nbsp;Et dès lors, je me suis baigné dans le Poème<br>De la Mer, infusé d'astres, et lactescent&nbsp;»</p>
+                    <footer class="mt-6 text-sm text-stone-300">— Arthur Rimbaud, <cite class="italic">Le Bateau ivre</cite>, 1871</footer>
+                </blockquote>
+
+                <div class="{{ panel }} mt-[16svh] ml-auto max-w-3xl" data-story-target="reveal">
+                    <h2 id="chapitre-2-titre" class="{{ h2_style }}">Explorer</h2>
+                    <p class="mt-5 text-lg leading-relaxed text-stone-300">
+                        Chaque catégorie est un rivage. Laissez la houle vous porter d'un genre à l'autre&nbsp;:
+                        {% if categories is not empty %}{{ categories|length }} rivage{{ categories|length > 1 ? 's' }} vous attende{{ categories|length > 1 ? 'nt' }} au large.{% else %}les premiers rivages n'ont pas encore été tracés.{% endif %}
+                    </p>
+                </div>
+
+                {% if categories is not empty %}
+                    <ul class="mt-14 flex flex-wrap justify-center gap-x-3 gap-y-5" data-story-target="wave" aria-label="Catégories">
+                        {% for category in categories %}
+                            <li>
+                                <a href="{{ path('app_book_by_category', {categoryName: category.name}) }}" data-story-target="chip" class="inline-flex items-center gap-3 rounded-full border border-slate-200/20 bg-slate-950/55 py-2 pr-2 pl-5 font-medium text-slate-100 transition-colors hover:border-amber-300/70 hover:bg-amber-300/15 hover:text-amber-100 {{ fv }}">
+                                    {{ category.name }}
+                                    <span class="grid h-7 min-w-7 place-items-center rounded-full bg-slate-200/15 px-1.5 text-xs tabular-nums" aria-label="{{ category.bookCount }} livre{{ category.bookCount > 1 ? 's' }}">{{ category.bookCount }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </section>
+
+        {# Chapitre III — La ville : les derniers livres, derrière des fenêtres qui s'allument #}
+        <section id="chapitre-3" class="relative z-10" data-story-target="chapter" data-scene="ville" aria-labelledby="chapitre-3-titre">
+            <div class="mx-auto max-w-6xl px-6 pt-[30svh] pb-[22svh] md:px-8">
+                <header class="relative">
+                    <span class="story-knot hidden -left-4.5 story-motion:block md:-left-6 xl:-left-10" data-story-target="knot"></span>
+                    <span class="story-numeral right-0" data-story-target="numeral" aria-hidden="true">III</span>
+                    <p class="{{ eyebrow }}">Chapitre III · La ville</p>
+                </header>
+                <blockquote class="relative mt-8 max-w-4xl">
+                    <p class="{{ quote_style }}" data-story-target="quote">«&nbsp;Il n'est pas d'objet plus profond, plus mystérieux, plus fécond, plus ténébreux, plus éblouissant qu'une fenêtre éclairée d'une chandelle.&nbsp;»</p>
+                    <footer class="mt-6 text-sm text-stone-300">— Charles Baudelaire, <cite class="italic">Les Fenêtres</cite>, 1869</footer>
+                </blockquote>
+
+                <div class="{{ panel }} mt-[16svh] max-w-3xl" data-story-target="reveal">
+                    <h2 id="chapitre-3-titre" class="{{ h2_style }}">Partager</h2>
+                    <p class="mt-5 text-lg leading-relaxed text-stone-300">Derrière chaque fenêtre, un lecteur vient de déposer un livre. Voici les derniers arrivés sur les étagères.</p>
+                    <a href="{{ path('app_books') }}" class="{{ lien_texte }} mt-6">Voir tous les livres {{ fleche }}</a>
+                </div>
+
+                {% if latestBooks is not empty %}
+                    <ol class="mt-16 grid grid-cols-2 gap-x-6 gap-y-10 rounded-t-[2.5rem] border border-white/5 bg-stone-950/50 px-6 pt-12 pb-10 sm:gap-x-10 md:px-10 lg:grid-cols-4" data-story-target="facade" aria-label="Derniers livres ajoutés">
+                        {% for book in latestBooks %}
+                            <li class="story-window" data-story-target="window">
+                                <a href="{{ path('app_book_detaille', {id: book.id}) }}" class="story-window__link">
+                                    <span class="story-window__glow" aria-hidden="true"></span>
+                                    <span class="story-window__bars" aria-hidden="true"></span>
+                                    <span class="story-window__text">
+                                        <span class="story-window__title">{{ book.title }}</span>
+                                        <span class="story-window__meta">{{ book.author }}{{ book.user ? ' · par ' ~ book.user.firstname }}</span>
+                                    </span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    <p class="mt-16 text-center font-['Fraunces',serif] text-2xl text-stone-300 italic">Les fenêtres sont encore éteintes&nbsp;: aucun livre n'a été déposé.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        {# Chapitre IV — La nuit : les parcours dessinent la Grande Ourse #}
+        <section id="chapitre-4" class="relative z-10" data-story-target="chapter" data-scene="nuit" aria-labelledby="chapitre-4-titre">
+            <div class="mx-auto max-w-6xl px-6 pt-[30svh] pb-[18svh] md:px-8">
+                <header class="relative text-right">
+                    <span class="story-knot hidden -right-4.5 story-motion:block md:-right-6 xl:-right-10" data-story-target="knot"></span>
+                    <span class="story-numeral left-0" data-story-target="numeral" aria-hidden="true">IV</span>
+                    <p class="{{ eyebrow }}">Chapitre IV · La nuit</p>
+                </header>
+                <blockquote class="relative mt-8 ml-auto max-w-4xl text-right">
+                    <p class="{{ quote_style }}" data-story-target="quote">«&nbsp;Mon auberge était à la Grande-Ourse.<br>— Mes étoiles au ciel avaient un doux frou-frou&nbsp;»</p>
+                    <footer class="mt-6 text-sm text-stone-300">— Arthur Rimbaud, <cite class="italic">Ma Bohème</cite>, 1870</footer>
+                </blockquote>
+
+                <div class="{{ panel }} mt-[16svh] ml-auto max-w-3xl" data-story-target="reveal">
+                    <h2 id="chapitre-4-titre" class="{{ h2_style }}">Apprendre</h2>
+                    <p class="mt-5 text-lg leading-relaxed text-stone-300">{{ formations|length }} parcours pour passer des bases de PHP à une application Symfony complète. Suivez-les d'étoile en étoile&nbsp;: ils dessinent la Grande Ourse.</p>
+                </div>
+
+                <div class="story-sky mt-20" data-story-target="sky">
+                    <svg class="story-sky__lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                        {% for line in sky_lines %}
+                            {% set from = sky_slots[line[0]] %}
+                            {% set to = sky_slots[line[1]] %}
+                            <line data-story-target="starLine" data-from="{{ line[0] }}" data-to="{{ line[1] }}" x1="{{ from.x }}" y1="{{ from.y }}" x2="{{ to.x }}" y2="{{ to.y }}"/>
+                        {% endfor %}
+                    </svg>
+                    {% for slot in sky_slots %}
+                        {% if loop.index0 not in used_slots %}
+                            <span class="story-sky__decor" data-slot="{{ loop.index0 }}" style="--x: {{ slot.x }}%; --y: {{ slot.y }}%" aria-hidden="true"><span class="story-star"></span></span>
+                        {% endif %}
+                    {% endfor %}
+                    <ol class="story-sky__list">
+                        {% for item in formations %}
+                            {% set slot_index = sky_order[loop.index0] ?? null %}
+                            {% set slot = slot_index is not null ? sky_slots[slot_index] : null %}
+                            <li class="story-sky__item" {% if slot %}data-slot="{{ slot_index }}" data-place="{{ slot.place }}" style="--x: {{ slot.x }}%; --y: {{ slot.y }}%"{% endif %}>
+                                <span class="story-star" aria-hidden="true"></span>
+                                <div class="story-sky__label">
+                                    <p class="text-[11px] font-semibold tracking-[0.2em] text-sky-200/80 uppercase">Parcours {{ loop.index }}</p>
+                                    <h3 class="mt-1 font-['Fraunces',serif] text-xl font-medium text-stone-50">{{ item.title }}</h3>
+                                    <p class="mt-1 text-sm leading-relaxed text-stone-300">{{ item.description }}</p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </section>
     </div>
-</section>
+
+    {# ---------- Épilogue : la lettre ---------- #}
+    <section id="epilogue" class="relative z-10 story-motion:h-[300svh]" data-story-target="epilogue" data-scene="bougie" aria-labelledby="epilogue-titre">
+        <div class="sticky top-0 flex min-h-svh flex-col items-center justify-center gap-10 overflow-hidden px-4 py-20 story-motion:h-svh story-motion:py-0">
+            <div class="text-center story-motion:absolute story-motion:top-[6svh]" data-story-target="letterIntro">
+                <p class="{{ eyebrow }}">Épilogue</p>
+                <h2 id="epilogue-titre" class="{{ h2_style }} mt-3">Une lettre pour vous</h2>
+            </div>
+
+            <div class="story-letter-scene">
+                <article class="story-letter" data-story-target="letter" data-action="focusin->story#revealLetter" aria-label="Lettre de la bibliothèque">
+                    <div class="story-letter__panel story-letter__panel--top" data-story-target="letterTop">
+                        <div class="story-letter__face">
+                            <p class="story-letter__date">Paris, le {{ aujourdhui }}</p>
+                            <p class="story-letter__greeting story-letter__script">{{ user_name ? 'Bonsoir ' ~ user_name ~ ',' : 'Bonsoir à vous qui lisez ces lignes,' }}</p>
+                            <span class="story-letter__shade" data-story-target="letterShade"></span>
+                        </div>
+                        <div class="story-letter__back" aria-hidden="true">
+                            <div>
+                                <p class="text-[0.7rem] tracking-[0.25em] text-[#8a6a3a] uppercase">À l'attention de</p>
+                                <p class="story-letter__script mt-1 text-[calc(var(--ph)*0.19)] leading-none">{{ app.user ? app.user.firstname ~ ' ' ~ app.user.lastname : 'vous, lecteur ou lectrice' }}</p>
+                                <p class="mt-2 text-xs text-[#7a5a32] italic">Bibliothèque SymfonyLib · en main propre</p>
+                            </div>
+                            <div class="story-letter__stamp"><span>Symfony<br>Lib<br><strong>{{ 'now'|date('Y') }}</strong></span></div>
+                        </div>
+                    </div>
+                    <div class="story-letter__panel story-letter__panel--middle">
+                        <div class="story-letter__face">
+                            <p class="story-letter__body">
+                                {% if app.user %}
+                                    Votre place à notre table vous attend toujours. Les étagères comptent désormais {{ bookCount }} livre{{ bookCount > 1 ? 's' }}&nbsp;: venez voir ce que les autres lecteurs y ont déposé, et laissez-y à votre tour un titre qui vous a fait voyager.
+                                {% else %}
+                                    Il reste une place à notre table. Apportez les livres qui vous ont fait voyager, racontez ce qu'ils ont changé en vous, et repartez avec ceux des autres. Ici, chaque lecteur écrit une page de l'histoire.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="story-letter__panel story-letter__panel--bottom" data-story-target="letterBottom">
+                        <div class="story-letter__face">
+                            <p class="story-letter__closing">Avec toute notre amitié,</p>
+                            <p class="story-letter__signature story-letter__script">
+                                La bibliothèque
+                                <svg class="story-letter__flourish" viewBox="0 0 220 30" fill="none" aria-hidden="true"><path data-story-target="flourish" pathLength="1" stroke-dasharray="1" d="M4 20C40 4 70 30 110 16s60-14 106-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                            </p>
+                            <div class="mt-auto flex flex-wrap gap-2">
+                                {% if app.user %}
+                                    <a href="{{ path('app_books') }}" class="rounded-lg bg-[#2b1d12] px-4 py-2 text-sm font-semibold text-[#f6eedb] transition-colors hover:bg-[#4a2f1b] {{ fv }}">Parcourir le catalogue</a>
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <a href="{{ path('app_add_book') }}" class="rounded-lg border border-[#2b1d12]/40 px-4 py-2 text-sm font-semibold text-[#2b1d12] transition-colors hover:bg-[#2b1d12]/10 {{ fv }}">Ajouter un livre</a>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{{ path('app_register') }}" class="rounded-lg bg-[#2b1d12] px-4 py-2 text-sm font-semibold text-[#f6eedb] transition-colors hover:bg-[#4a2f1b] {{ fv }}">Rejoindre la bibliothèque</a>
+                                    <a href="{{ path('app_login') }}" class="rounded-lg border border-[#2b1d12]/40 px-4 py-2 text-sm font-semibold text-[#2b1d12] transition-colors hover:bg-[#2b1d12]/10 {{ fv }}">J'ai déjà ma carte</a>
+                                {% endif %}
+                            </div>
+                            <span class="story-letter__shade" data-story-target="letterShade"></span>
+                        </div>
+                        <div class="story-letter__back" aria-hidden="true"></div>
+                    </div>
+
+                    {# Cachet de cire, en deux moitiés qui se séparent à l'ouverture #}
+                    <div class="story-seal hidden story-motion:block" aria-hidden="true">
+                        {% for side in ['left', 'right'] %}
+                            <span class="story-seal__half story-seal__half--{{ side }}" data-story-target="sealHalf">
+                                <svg viewBox="0 0 100 100">
+                                    <defs>
+                                        <radialGradient id="story-wax-{{ side }}" cx="38%" cy="32%" r="75%">
+                                            <stop offset="0" stop-color="#c2413a"/>
+                                            <stop offset="0.55" stop-color="#8f1d1d"/>
+                                            <stop offset="1" stop-color="#5c1010"/>
+                                        </radialGradient>
+                                    </defs>
+                                    <path fill="url(#story-wax-{{ side }})" d="M50 3c10 1 13 6 22 6s13 8 17 16 8 14 7 25-2 16-3 24-12 12-20 17-15 6-23 6-15-2-23-6-15-9-19-18-5-14-4-23-2-15 3-23 11-14 20-18S41 2 50 3Z"/>
+                                    <circle cx="50" cy="50" r="30" fill="none" stroke="#5c1010" stroke-opacity="0.55" stroke-width="2.5"/>
+                                    <circle cx="50" cy="50" r="26.5" fill="none" stroke="#e0736b" stroke-opacity="0.35"/>
+                                    <text x="50" y="62" text-anchor="middle" font-family="Fraunces, serif" font-size="34" font-style="italic" fill="#4a0d0d" fill-opacity="0.75">S</text>
+                                </svg>
+                            </span>
+                        {% endfor %}
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    {# ---------- Fin ---------- #}
+    <section class="relative z-10 grid min-h-[85svh] place-items-center px-6 text-center" data-story-target="coda">
+        <div>
+            <p class="font-['Fraunces',serif] text-6xl text-stone-100 italic md:text-8xl" data-story-target="codaTitle">À suivre…</p>
+            <p class="mt-6 text-lg text-stone-400">La suite s'écrit avec vous.</p>
+            <p class="mx-auto mt-20 max-w-2xl text-xs leading-relaxed text-stone-500">
+                Photographies Unsplash&nbsp;:
+                {% for scene in scenes %}<a href="{{ scene.credit }}" class="underline decoration-stone-700 underline-offset-2 hover:text-stone-300 {{ fv }}" rel="noopener">{{ scene.label }}</a>{{ not loop.last ? ' · ' }}{% endfor %}.
+                Citations&nbsp;: Victor Hugo, Arthur Rimbaud, Charles Baudelaire.
+            </p>
+        </div>
+    </section>
+</div>
 {% endblock %}

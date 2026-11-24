@@ -12,4 +12,17 @@ class BookService {
     public function getBookById(int $id):?Book {
        return  $this->bookRepository->find($id);
     }
+
+    /**
+     * @return list<Book>
+     */
+    public function getLatestBooks(int $limit): array
+    {
+        return $this->bookRepository->findLatest($limit);
+    }
+
+    public function countBooks(): int
+    {
+        return $this->bookRepository->count([]);
+    }
 }

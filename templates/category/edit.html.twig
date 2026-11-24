@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ form_start(categoryForm) }}
+        {{ form_errors(categoryForm) }}
+        {{ form_row(categoryForm.name) }}
+        <button type="submit">Modifier</button>
+    {{ form_end(categoryForm) }}
+{% endblock %}

@@ -1,6 +1,8 @@
 <?php
 namespace App\Controller;
 
+use App\Repository\CategoryRepository;
+use App\Service\BookService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -30,9 +32,20 @@ class HomeController extends AbstractController {
 ];
 
 
-    public function index():Response{
+    public function __construct(
+        private readonly BookService $bookService,
+        private readonly CategoryRepository $categoryRepository,
+    ) {
+    }
 
-        return $this->render('home/index.html.twig', ['formations'=>$this->formations]);
+    public function index(): Response
+    {
+        return $this->render('home/index.html.twig', [
+            'formations' => $this->formations,
+            'bookCount' => $this->bookService->countBooks(),
+            'latestBooks' => $this->bookService->getLatestBooks(8),
+            'categories' => $this->categoryRepository->findNonEmptyWithBookCount(),
+        ]);
     }
 }
 

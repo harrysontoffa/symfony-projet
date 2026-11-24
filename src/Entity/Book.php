@@ -38,6 +38,7 @@ class Book
 
     public function __construct()
     {
+        $this->publishedAt= new \DateTimeImmutable();
         $this->categories = new ArrayCollection();
     }
 

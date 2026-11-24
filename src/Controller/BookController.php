@@ -4,11 +4,15 @@ namespace App\Controller;
 
 use App\Repository\BookRepository;
 use App\Service\BookService;
+use Doctrine\ORM\EntityManagerInterface;
 use PhpParser\Node\Stmt\TryCatch;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Entity\Book;
+use App\Form\BookFormType;
 
 class BookController extends AbstractController {
     private BookService $bookService;
@@ -57,4 +61,24 @@ class BookController extends AbstractController {
 
         return $this->render('book/show_by_category.html.twig', ['books' => $books, 'categoryName' => $categoryName]);
     }
+
+    #[Route('/Ajout/book', name:'app_add_book')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function addBook(Request $request , EntityManagerInterface $entityManager):Response{
+        $messageAffichage = '';
+        $book= new Book();
+        $form= $this->createForm(BookFormType::class, $book);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $entityManager->persist($book);
+            $entityManager->flush();
+            //  $this->addFlash('sucess', 'Livre créé avec succès');
+
+
+            return $this->redirectToRoute('app_add_book');
+        }
+        return $this->render('book/AddBookForm.html.twig', ['BookForm'=>$form, 'message'=> $messageAffichage]);
+
+    }
+
 }

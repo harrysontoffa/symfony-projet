@@ -2,7 +2,7 @@
 {% set liens = [
     {label: 'Accueil', url: path('app_home'), routes: ['app_home']},
     {label: 'Livres', url: path('app_books'), routes: ['app_books', 'app_book_detaille']},
-    {label: 'Utilisateurs', url: path('app_showUser'), routes: ['app_showUser']},
+
 ] %}
 {% set nav_base = 'rounded-lg px-4 py-2.5 text-[15px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400' %}
 {% set nav_actif = 'bg-stone-900 text-stone-100' %}
@@ -25,13 +25,28 @@
         <div class="flex flex-wrap items-center gap-2">
             {% if app.user %}
                 {% set profil_actif = route == 'app_profile' %}
+                {% if is_granted('ROLE_CLIENT') %}
+                    {{ render(controller('App\\Controller\\CategoryController::categories')) }}
+
+                {% elseif is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_add_categorie') }}">Ajouter une category</a>
+                <a href="{{ path('app_add_book') }}">Ajouter un livre</a>
+
+
+
+                {% endif %}
                 <a href="{{ path('app_profile', {name: app.user.userIdentifier}) }}" class="{{ nav_base }} {{ profil_actif ? nav_actif : nav_inactif }}"{% if profil_actif %} aria-current="page"{% endif %}>Mon profil</a>
                 <a href="{{ logout_path() }}" class="inline-flex items-center rounded-[10px] border border-stone-700 px-5 py-3 font-semibold text-stone-100 transition-colors hover:border-stone-500 hover:bg-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Déconnexion</a>
+
+                <p>Bonjour {{ app.user.firstname   }}</p>
+                <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-stone-900">{{ app.user.firstname|default(app.user.userIdentifier)|slice(0, 1)|upper  }} {{ app.user.lastname|default(app.user.userIdentifier)|slice(0, 1)|upper }}</span>
+                <p> {{ app.user.role.name }} </p>
             {% else %}
                 {% set connexion_actif = route == 'app_connexion' %}
-                <a href="{{ path('app_connexion') }}" class="{{ nav_base }} {{ connexion_actif ? nav_actif : nav_inactif }}"{% if connexion_actif %} aria-current="page"{% endif %}>Connexion</a>
-                <a href="{{ path('app_inscription') }}" class="inline-flex items-center gap-2 rounded-[10px] bg-amber-400 px-5 py-3 font-semibold text-stone-950 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">S'inscrire</a>
+                <a href="{{ path('app_login') }}" class="{{ nav_base }} {{ connexion_actif ? nav_actif : nav_inactif }}"{% if connexion_actif %} aria-current="page"{% endif %}>Connexion</a>
+                <a href="{{ path('app_register') }}" class="inline-flex items-center gap-2 rounded-[10px] bg-amber-400 px-5 py-3 font-semibold text-stone-950 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">S'inscrire</a>
             {% endif %}
+
         </div>
     </div>
 </header>

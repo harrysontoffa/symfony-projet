@@ -37,6 +37,20 @@ class BookRepository extends ServiceEntityRepository
     }
 
 
+    /**
+     * Les derniers livres ajoutés au catalogue.
+     *
+     * @return list<Book>
+     */
+    public function findLatest(int $limit): array
+    {
+        return $this->createQueryBuilder('book')
+            ->orderBy('book.id', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findByCategory(string $categoryName): array
     {
         return $this->createQueryBuilder('book')

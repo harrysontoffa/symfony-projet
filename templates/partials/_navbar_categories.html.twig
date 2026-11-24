@@ -1,0 +1,6 @@
+<select name="categoryListe" class="rounded-lg border border-stone-700 bg-stone-900 px-3 py-2 text-[15px] font-medium text-stone-100 focus:border-amber-400 focus:outline-none">
+    <option value="" selected disabled>Catégories</option>
+    {% for item in categories %}
+        <option value="{{ item.id }}">{{ item.name }}</option>
+    {% endfor %}
+</select>

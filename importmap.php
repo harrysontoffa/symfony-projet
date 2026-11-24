@@ -27,4 +27,9 @@ return [
     '@hotwired/stimulus' => ['version' => '3.2.2'],
     '@symfony/stimulus-bundle' => ['path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js'],
     '@hotwired/turbo' => ['version' => '8.0.23'],
+    'gsap' => ['version' => '3.15.1'],
+    'gsap/ScrollTrigger' => ['version' => '3.15.1'],
+    'gsap/SplitText' => ['version' => '3.15.1'],
+    'lenis' => ['version' => '1.3.27'],
+    'lenis/dist/lenis.css' => ['version' => '1.3.27', 'type' => 'css'],
 ];

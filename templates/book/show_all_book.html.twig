@@ -4,36 +4,86 @@
 
 {% block body %}
 {% set covers = ['bg-red-900', 'bg-sky-900', 'bg-emerald-900', 'bg-amber-800', 'bg-teal-900', 'bg-stone-700'] %}
-<section class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
-    <div class="mb-12 border-b border-stone-800 pb-10">
-        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Catalogue</p>
-        <h1 class="mt-5 font-['Fraunces',serif] text-5xl leading-[1.05] font-medium tracking-tight md:text-6xl">Tous les <em class="italic text-amber-400">livres</em></h1>
-        <p class="mt-6 max-w-xl text-lg leading-relaxed text-stone-400">{{ books|length }} livre(s) dans la bibliothèque. Choisissez un titre pour lire son résumé.</p>
+<div data-controller="bookshelf" class="relative overflow-x-clip">
+
+    {# Marque-page : descend avec la progression du scroll (animé par bookshelf_controller.js) #}
+    <div aria-hidden="true" class="pointer-events-none fixed top-0 right-6 z-40 hidden md:block lg:right-10 motion-reduce:hidden">
+        <div data-bookshelf-target="ribbon" class="invisible h-[55vh] w-7 bg-linear-to-b from-amber-500 to-amber-400 shadow-[0_10px_30px_rgba(251,191,36,0.25)] [clip-path:polygon(0_0,100%_0,100%_100%,50%_calc(100%-14px),0_100%)]">
+            <div class="mx-auto h-full w-px bg-amber-300/60"></div>
+        </div>
     </div>
 
-    {% if books is empty %}
-        <div class="py-16 text-center">
-            <p class="text-stone-400">Aucun livre trouvé.</p>
-            <a href="{{ path('app_home') }}" class="mt-6 inline-flex items-center rounded-[10px] border border-stone-700 px-5 py-3 font-semibold text-stone-100 transition-colors hover:border-stone-500 hover:bg-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Retour à l'accueil</a>
+    <section class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+        <div data-bookshelf-target="intro" class="mb-16 border-b border-stone-800 pb-10">
+            <p data-bookshelf-target="reveal" class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Catalogue</p>
+            <h1 data-bookshelf-target="title" class="mt-5 font-['Fraunces',serif] text-5xl leading-[1.05] font-medium tracking-tight md:text-6xl">Tous les <em class="italic text-amber-400">livres</em></h1>
+            <p data-bookshelf-target="reveal" class="mt-6 max-w-xl text-lg leading-relaxed text-stone-400">{{ books|length }} livre(s) dans la bibliothèque. Choisissez un titre pour lire son résumé.</p>
         </div>
-    {% else %}
-        <ul class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {% for item in books %}
-                <li>
-                    <a href="{{ path('app_book_detaille', {id: item.id}) }}" class="group flex flex-col gap-4 rounded-r-[10px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400">
-                        <div class="{{ covers[loop.index0 % covers|length] }} flex aspect-[2/3] flex-col justify-between rounded-l-[4px] rounded-r-[10px] p-7 transition duration-200 group-hover:-translate-y-1">
-                            <span class="font-['Fraunces',serif] text-2xl leading-tight font-medium tracking-tight text-stone-100">{{ item.title }}</span>
-                            <span class="text-xs uppercase tracking-widest text-stone-200">{{ item.author }}</span>
-                        </div>
-                        <div>
-                            <h2 class="font-['Fraunces',serif] text-xl font-medium tracking-tight transition-colors group-hover:text-amber-400">{{ item.title }}</h2>
-                            <p class="mt-1 text-stone-400">{{ item.author }}</p>
-                            <p class="mt-1 text-sm text-stone-400">{{ item.publishedAt ? item.publishedAt|date('d/m/Y') : 'Non publié' }} · {{ item.user ? item.user.firstname : 'Anonyme' }}</p>
-                        </div>
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-</section>
+
+        {% if books is empty %}
+            <div class="py-16 text-center">
+                <p class="text-stone-400">Aucun livre trouvé.</p>
+                <a href="{{ path('app_home') }}" class="mt-6 inline-flex items-center rounded-[10px] border border-stone-700 px-5 py-3 font-semibold text-stone-100 transition-colors hover:border-stone-500 hover:bg-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Retour à l'accueil</a>
+            </div>
+        {% else %}
+            <div class="relative">
+                {# Mot géant en contour qui glisse derrière les livres #}
+                <div aria-hidden="true" class="pointer-events-none sticky top-[28vh] h-0">
+                    <p data-bookshelf-target="ghost" class="font-['Fraunces',serif] text-[22vw] leading-none font-medium whitespace-nowrap text-transparent italic [-webkit-text-stroke:1px_rgb(68_64_60)]">Bibliothèque</p>
+                </div>
+
+                <ul data-bookshelf-target="grid" class="relative z-10 grid grid-cols-1 gap-x-10 gap-y-16 sm:grid-cols-2 lg:grid-cols-4">
+                    {% for item in books %}
+                        {% set cover = covers[loop.index0 % covers|length] %}
+                        <li data-bookshelf-target="item">
+                            <a href="{{ path('app_book_detaille', {id: item.id}) }}" class="group flex flex-col gap-6 rounded-r-[10px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400">
+                                {# Scène 3D : intro (chargement) > scroll (GSAP) > survol (CSS) > faces du livre #}
+                                <div class="relative aspect-[2/3] perspective-[1100px]">
+                                    <div data-book="shadow" aria-hidden="true" class="absolute inset-x-6 -bottom-4 h-6 rounded-full bg-black/70 blur-xl"></div>
+                                    <div data-book="intro" class="absolute inset-0 transform-3d">
+                                        <div data-book="scroll" class="absolute inset-0 transform-3d">
+                                            <div class="absolute inset-0 transform-3d transition-transform duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:-translate-y-2 group-hover:rotate-y-[32deg] group-focus-visible:rotate-y-[32deg] motion-reduce:transition-none">
+
+                                                {# Couverture #}
+                                                <div class="{{ cover }} absolute inset-0 flex flex-col justify-between overflow-hidden rounded-l-[3px] rounded-r-[10px] p-7 [transform:translateZ(1rem)]">
+                                                    <span aria-hidden="true" class="absolute inset-y-0 left-3 w-px bg-black/25"></span>
+                                                    <span aria-hidden="true" class="absolute inset-0 bg-linear-to-r from-black/30 via-white/5 to-black/20"></span>
+                                                    <span data-book="sheen" aria-hidden="true" class="absolute inset-y-0 -left-1/4 w-2/3 -skew-x-12 bg-linear-to-r from-transparent via-white/25 to-transparent"></span>
+                                                    <span class="relative font-['Fraunces',serif] text-2xl leading-tight font-medium tracking-tight text-stone-100">{{ item.title }}</span>
+                                                    <span class="relative text-xs uppercase tracking-widest text-stone-200">{{ item.author }}</span>
+                                                </div>
+
+                                                {# Dos du livre #}
+                                                <div aria-hidden="true" class="{{ cover }} absolute top-0 left-0 flex h-full w-8 flex-col items-center justify-between overflow-hidden py-4 [transform:translateX(-1rem)_rotateY(-90deg)]">
+                                                    <span class="absolute inset-0 bg-black/35"></span>
+                                                    <span class="relative h-px w-5 bg-amber-400/70"></span>
+                                                    <span class="relative max-h-[70%] truncate font-['Fraunces',serif] text-xs font-medium tracking-wide text-stone-200 [writing-mode:vertical-rl]">{{ item.title }}</span>
+                                                    <span class="relative h-px w-5 bg-amber-400/70"></span>
+                                                </div>
+
+                                                {# Tranche des pages #}
+                                                <div aria-hidden="true" class="absolute top-[3px] right-0 bottom-[3px] w-7 bg-[repeating-linear-gradient(90deg,#f5f5f4_0px,#e7e5e4_1px,#d6d3d1_2px,#f5f5f4_3px)] [transform:translateX(calc(0.875rem_-_2px))_rotateY(90deg)]"></div>
+
+                                                {# 4e de couverture #}
+                                                <div aria-hidden="true" class="{{ cover }} absolute inset-0 rounded-l-[10px] rounded-r-[3px] [transform:translateZ(-1rem)_rotateY(180deg)]">
+                                                    <span class="absolute inset-0 rounded-[inherit] bg-black/45"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h2 class="font-['Fraunces',serif] text-xl font-medium tracking-tight transition-colors group-hover:text-amber-400">{{ item.title }}</h2>
+                                    <p class="mt-1 text-stone-400">{{ item.author }}</p>
+                                    <p class="mt-1 text-sm text-stone-400">{{ item.publishedAt ? item.publishedAt|date('d/m/Y') : 'Non publié' }} · {{ item.user ? item.user.firstname : 'Anonyme' }}</p>
+                                </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </section>
+</div>
 {% endblock %}

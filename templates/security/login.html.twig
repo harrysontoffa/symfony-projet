@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+{% set champ = 'h-12 w-full rounded-[10px] border border-stone-700 bg-stone-950 px-4 text-stone-100 placeholder:text-stone-500 focus:border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-400/20' %}
+{% set label = 'mb-2 block text-sm font-medium text-stone-300' %}
+{% set lien = 'rounded-sm font-semibold text-amber-400 hover:text-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400' %}
+<section class="mx-auto max-w-6xl px-6 py-20 md:px-8 md:py-24">
+    <div class="flex flex-wrap items-center justify-between gap-16">
+        <div class="max-w-xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Connexion</p>
+            <h1 class="mt-5 font-['Fraunces',serif] text-5xl leading-[1.05] font-medium tracking-tight md:text-6xl">Bon retour <em class="italic text-amber-400">parmi</em> nous.</h1>
+            <p class="mt-6 max-w-xl text-lg leading-relaxed text-stone-400">Connectez-vous pour retrouver vos livres et votre profil.</p>
+        </div>
+
+        <form method="post" action="{{ path('app_login') }}" class="flex w-full max-w-md flex-col gap-6 rounded-2xl border border-stone-800 bg-stone-900 p-10">
+            {% if error %}
+                <twig:Alert type="danger" message="{{ error.messageKey|trans(error.messageData, 'security') }}" />
+            {% endif %}
+
+            {% if app.user %}
+                <p class="text-sm text-stone-300">
+                    Vous êtes connecté en tant que <span class="font-semibold text-stone-100">{{ app.user.userIdentifier }}</span>.
+                    <a href="{{ logout_path() }}" class="{{ lien }}">Se déconnecter</a>
+                </p>
+            {% endif %}
+
+            <div>
+                <label for="username" class="{{ label }}">Adresse email</label>
+                <input type="email" id="username" name="_username" value="{{ last_username }}" autocomplete="email" required autofocus placeholder="vous@exemple.fr" class="{{ champ }}">
+            </div>
+            <div>
+                <label for="password" class="{{ label }}">Mot de passe</label>
+                <input type="password" id="password" name="_password" autocomplete="current-password" required class="{{ champ }}">
+            </div>
+
+            <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+            {#
+                Case « Se souvenir de moi » : à décommenter après avoir ajouté
+                l'option remember_me sous le firewall main (config/packages/security.yaml).
+                https://symfony.com/doc/current/security/remember_me.html
+
+            <div class="flex items-center gap-3">
+                <input type="checkbox" id="remember_me" name="_remember_me" class="h-[18px] w-[18px] accent-amber-400">
+                <label for="remember_me" class="text-sm font-medium text-stone-300">Se souvenir de moi</label>
+            </div>
+            #}
+
+            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-[10px] bg-amber-400 px-5 py-3 font-semibold text-stone-950 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400">Se connecter</button>
+            <p class="text-center text-sm text-stone-400">
+                Pas encore de compte ?
+                <a href="{{ path('app_register') }}" class="{{ lien }}">S'inscrire</a>
+            </p>
+        </form>
+    </div>
+</section>
+{% endblock %}

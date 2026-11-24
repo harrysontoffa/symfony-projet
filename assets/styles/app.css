@@ -1,1 +1,5 @@
 @import "tailwindcss";
+@import "./story.css";
+
+/* Actif quand story_controller.js anime l'accueil (attribut posé sur la racine de l'histoire). */
+@custom-variant story-motion (&:where([data-story-motion], [data-story-motion] *));

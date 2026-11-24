@@ -2,9 +2,12 @@
 
 namespace App\Repository;
 
+use App\Dto\CategoryCountDto;
 use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+
 
 /**
  * @extends ServiceEntityRepository<Category>
@@ -15,6 +18,41 @@ class CategoryRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Category::class);
     }
+
+    /**
+     * Catégories qui contiennent au moins un livre, avec leur nombre de livres.
+     *
+     * Regroupées par nom, comme la recherche /search/category/{categoryName} :
+     * deux catégories homonymes ne forment qu'un seul rivage.
+     *
+     * @return list<CategoryCountDto>
+     */
+    public function findNonEmptyWithBookCount(): array
+    {
+        $rows = $this->createQueryBuilder('category')
+            ->select('category.name AS name', 'COUNT(DISTINCT book.id) AS bookCount')
+            ->innerJoin('category.books', 'book')
+            ->groupBy('category.name')
+            ->orderBy('bookCount', 'DESC')
+            ->addOrderBy('category.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(
+            static fn (array $row): CategoryCountDto => new CategoryCountDto($row['name'], (int) $row['bookCount']),
+            $rows,
+        );
+    }
+    // src/Repository/CategoryRepository.php
+public function save(Category $category, bool $flush = true): void
+{
+    $this->getEntityManager()->persist($category);
+
+    if ($flush) {
+        $this->getEntityManager()->flush();
+    }
+}
+
 
 //    /**
 //     * @return Category[] Returns an array of Category objects
