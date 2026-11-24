@@ -12,11 +12,15 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Repository\RoleRepository;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\String\Slugger\SluggerInterface;
+
+
 
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, RoleRepository $roleRepository): Response
+    public function register(Request $request, SluggerInterface $slugger, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, RoleRepository $roleRepository): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -28,6 +32,29 @@ class RegistrationController extends AbstractController
 
             // encode the plain password
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+
+            $iconFile=$form->get('icon')->getData();
+
+            if($iconFile){
+                $originaleFileName = pathinfo($iconFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilname= $slugger->slug($originaleFileName);
+                $newFilename= $safeFilname . '-'.uniqid(). '-'. $iconFile->guessExtension();
+
+                try {
+                    $iconFile->move(
+                        $this->getParameter('icons_directory'),
+                        $newFilename
+
+                    );
+                    $user->setIcon($newFilename);
+
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Erreur lors de l\'envoi de l\'image.');
+                    $user->setIcon('profil.png');
+                }
+            } else {
+                $user->setIcon('profil.png');
+            }
 
             $deaultRole= $roleRepository->find(6);
             if(!$deaultRole){

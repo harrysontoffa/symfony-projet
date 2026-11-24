@@ -14,10 +14,6 @@ app_home:
     path: /
     controller: App\Controller\HomeController::index
 
-app_profile:
-    path: /profile/{name}
-    controller: App\Controller\UserController::profile
-
 app_inscription:
     path: /inscription
     controller: App\Controller\UserController::inscription
